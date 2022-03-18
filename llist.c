@@ -15,7 +15,7 @@ typedef struct node {
 struct list_struct {
     NODE *front;
     NODE *back;
-}LIST;
+};
 
 
 /*
@@ -65,8 +65,8 @@ int lst_are_equal(LIST *lst1, LIST *lst2)
 {
   NODE *p1;
   NODE *p2;
-  p1 = list1->front;
-  p2 = list2->front;
+  p1 = lst1->front;
+  p2 = lst2->front;
 
   while((p1->next != NULL) && (p2->next != NULL))
   {
@@ -80,15 +80,36 @@ int lst_are_equal(LIST *lst1, LIST *lst2)
 }
 
 /**
-* TODO: .:  print in reverse order 
-*
+ * Runs until reaching head at NULL, when null, returns backwards reversing the list
+ **/
+NODE *recrusiveReverseList(NODE *p)//! Do we pass NODE or LIST?
+{
+  if(p==NULL) return NULL;
+  if(p->next==NULL) return p;//One size node
+  NODE *tmp = recrusiveReverseList(p->next);//*Stores values in reverse ordr
+  tmp->next->next = p;
+  p->next = NULL;//First is now last
+  return tmp;
+}
+
+
+/**
+* TODO: Logic is to start at front of list, use recursion to walk to end and print in reverse
+* 
 * Try to do without looking at notes!
 * Hints:  recursive helper function
 */
-void lst_print_rev(LIST *l) 
+void lst_print_rev(LIST *l) //! Probably needs filter, to verify none NULL ptr sending/returned
 {
-  
+  NODE *p = l->front;
+  NODE *tmp = NULL;
+
+  printf("\n\n***Before revers print**\n");
+  lst_print(l);
+  printf("\n***Reverse***");
+  recrusiveReverseList(p);
 }
+
 
 void lst_push_front(LIST *l, ElemType val) {
 NODE *p = malloc(sizeof(NODE));
@@ -117,7 +138,7 @@ NODE *p;
 }
 
 /** 
-*   TODO: ,
+*   TODO: .:.
 *   modifications to enable this operation
 *   to execute in O(1) time.  (You will almost
 *   certainly modify other functions and the 
@@ -155,7 +176,7 @@ int lst_count(LIST *l, ElemType x)
 
   while(p->next != NULL)//* Or while(p)
   {
-    if(p->x == x)
+    if(p->val == x)
     {
       occurrence++;
       p = p->next;
