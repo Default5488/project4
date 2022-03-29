@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "list.h"
-//Pushing test
 /**
 * See list.h for expected behavior of functions
 **/
@@ -55,6 +54,7 @@ NODE *p = l->front;
 }
 
 /**
+* !Done, Needs testing
 * TODO: .:.
 *   function:  lst_are_equal
 *   description:  returns true(1) if lst1 and lst2
@@ -94,6 +94,7 @@ NODE *recrusiveReverseList(NODE *p)//! Do we pass NODE or LIST?
 
 
 /**
+* !Done Needs testing
 * TODO: Logic is to start at front of list, use recursion to walk to end and print in reverse
 * 
 * Try to do without looking at notes!
@@ -138,6 +139,7 @@ NODE *p;
 }
 
 /** 
+* !Done needs testing
 *   TODO: .:.
 *   modifications to enable this operation
 *   to execute in O(1) time.  (You will almost
@@ -161,6 +163,7 @@ int lst_is_empty(LIST *l) {
 
 
 /** 
+* !Done needs testing
 *  TODO: Test functionality of implementation
 *
 *    function:  lst_count
@@ -213,7 +216,8 @@ int lst_sanity2(LIST *l) {
   return 1;
 }
 
-/*
+/**
+* TODO: Is this a need todo function?
 * function:  find_back()
 * description:  returns a pointer to the last
 *               node of the given list.
@@ -278,25 +282,52 @@ NODE *p;
 
 
 /**
-*    TODO: K    
+*    TODO: Testing
+*   !Needs testing
 *    if list is empty, we do nothing and return arbitrary value
 *    otherwise, the last element in the list is removed and its
 *      value is returned.
 *
 */
 ElemType lst_pop_back(LIST *l) {
+  NODE* tmp = l->first;//Points to front of list
+  NODE* prev  = NULL;
+  int pos;//Pos of linked list
+  
+  if(tmp == NULL){
+    l->first = tmp->next;//Changes head to next position
+    free(l->first);//Frees head
+  }
 
+  while(tmp->next != NULL){
+    prev = tmp;//Last point before removal
+    tmp = tmp->next;
+  }
+
+  prev->next = tmp->next;//Removes current tmp
+  free(tmp);//Frees current tmp
   return DEFAULT;
 } 
 
+
 /**
-*  TODO: .:.
+*  TODO: Testing
+*  !Testing
 *  For full credit, you cannot allocate any new memory!
-*
+* *Recursive helper function to reverse the order of the LL
 *  description:  self-evident 
 */
 void lst_reverse(LIST *l) {
+  NODE *prev = NULL;
+  NODE *curr = l->first;
+  NODE *next = NULL;
 
+  while(curr != NULL){
+    next = curr->next;//Stores next value
+    curr->next = prev;
+    prev = curr;
+    curr = next;
+  }
 }
 
 
@@ -332,6 +363,7 @@ NODE *tmp;
 
 
 /**
+* TODO: Is this a function that needs to be done
 * function: lst_remove_all_slow
 * description:  removes all occurrences of x
 *   from given list (if any).
@@ -350,6 +382,7 @@ int n=0;
 }
 
 /** 
+ * ? TODO: Is this a todo functionn
  * function: lst_sra_bad_case (sra:  slow_remove_all)
  *
  * description: constructs a list of length n such that 
@@ -372,7 +405,8 @@ int k=n/2;
   return l;
 }
 
-/** TODO: .: .
+/** \
+* TODO: .:.
 *   function:  lst_remove_all_fast
 *   description:  same behavior/semantics as
 *      lst_remove_all_slow.  However, this function
@@ -388,6 +422,7 @@ int lst_remove_all_fast(LIST *l, ElemType x) {
   return 0;
 }
 
+
 int lst_is_sorted(LIST *l){
 NODE *p = l->front;
 
@@ -400,8 +435,8 @@ NODE *p = l->front;
 }
 
 
-
-/** TODO: .: .
+/** 
+* TODO: .: .
 * function:  lst_insert_sorted
 *
 * description:  assumes given list is already in sorted order
@@ -418,7 +453,8 @@ void lst_insert_sorted(LIST *l, ElemType x) {
 
 }
 
-/** TODO: .
+/** 
+* TODO: .
  * function:  lst_merge_sorted
  *
  * description:  assumes both list a and b are in
