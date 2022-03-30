@@ -363,7 +363,7 @@ NODE *tmp;
 
 
 /**
-* TODO: Is this a function that needs to be done
+* ? TODO: Is this a function that needs to be done
 * function: lst_remove_all_slow
 * description:  removes all occurrences of x
 *   from given list (if any).
@@ -436,7 +436,7 @@ NODE *p = l->front;
 
 
 /** 
-* TODO: .: .
+* TODO: .:. Testing needed
 * function:  lst_insert_sorted
 *
 * description:  assumes given list is already in sorted order
@@ -449,8 +449,25 @@ NODE *p = l->front;
 * 		So... you don't need to check ahead of time if it is sorted.
 */
 void lst_insert_sorted(LIST *l, ElemType x) {
+    NODE *curr = l->front;
+    NODE *prev = NULL;
+    NODE *newNode = (NODE*)malloc(sizeof(NODE*));
 
-
+    if(curr == NULL)
+      return;//! ? Return Type?
+    else{
+      prev = curr;
+      while(curr != NULL){
+        if((x >= curr->val) && (x <= curr->next->val)){//Compares x value, in bounds !Needs
+          newNode->val = x;
+          newNode->next = curr->next;
+          prev->next = newNode;
+          curr = curr->next;
+        }else{
+          curr = curr->next;
+        }
+      }
+    }
 }
 
 /** 
