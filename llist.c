@@ -42,6 +42,7 @@ NODE *pnext;
   free(l);
 }
 
+
 void lst_print(LIST *l) {
 NODE *p = l->front;
 
@@ -94,7 +95,7 @@ NODE *recrusiveReverseList(NODE *p)//! Do we pass NODE or LIST?
 
 
 /**
-* !Done Needs testing
+* TODO: !Testing!
 * TODO: Logic is to start at front of list, use recursion to walk to end and print in reverse
 * 
 * Try to do without looking at notes!
@@ -103,7 +104,7 @@ NODE *recrusiveReverseList(NODE *p)//! Do we pass NODE or LIST?
 void lst_print_rev(LIST *l) //! Probably needs filter, to verify none NULL ptr sending/returned
 {
   NODE *p = l->front;
-  NODE *tmp = NULL;
+  // NODE *tmp = NULL;
 
   printf("\n\n***Before revers print**\n");
   lst_print(l);
@@ -140,7 +141,7 @@ NODE *p;
 
 /** 
 * !Done needs testing
-*   TODO: .:.
+*   TODO: Testing
 *   modifications to enable this operation
 *   to execute in O(1) time.  (You will almost
 *   certainly modify other functions and the 
@@ -217,7 +218,7 @@ int lst_sanity2(LIST *l) {
 }
 
 /**
-* TODO: Is this a need todo function?
+* ?TODO: Is this a need todo function?
 * function:  find_back()
 * description:  returns a pointer to the last
 *               node of the given list.
@@ -282,7 +283,7 @@ NODE *p;
 
 
 /**
-*    TODO: Testing
+*    TODO: Testing Needed
 *   !Needs testing
 *    if list is empty, we do nothing and return arbitrary value
 *    otherwise, the last element in the list is removed and its
@@ -290,13 +291,13 @@ NODE *p;
 *
 */
 ElemType lst_pop_back(LIST *l) {
-  NODE* tmp = l->first;//Points to front of list
+  NODE* tmp = l->front;//Points to front of list
   NODE* prev  = NULL;
-  int pos;//Pos of linked list
+  // int pos;//Pos of linked list
   
   if(tmp == NULL){
-    l->first = tmp->next;//Changes head to next position
-    free(l->first);//Frees head
+    l->front = tmp->next;//Changes head to next position
+    free(l->front);//Frees head
   }
 
   while(tmp->next != NULL){
@@ -319,7 +320,7 @@ ElemType lst_pop_back(LIST *l) {
 */
 void lst_reverse(LIST *l) {
   NODE *prev = NULL;
-  NODE *curr = l->first;
+  NODE *curr = l->front;
   NODE *next = NULL;
 
   while(curr != NULL){
@@ -426,7 +427,7 @@ int lst_remove_all_fast(LIST *l, ElemType x) {
 int lst_is_sorted(LIST *l){
 NODE *p = l->front;
 
-  while(p!=NULL && p->next != NULL) {
+  while(p!=NULL && p->next != NULL) {//? Might only need p->Next != NULL
 	if(p->val > p->next->val)
 	  return 0;
 	p = p->next;
@@ -471,7 +472,7 @@ void lst_insert_sorted(LIST *l, ElemType x) {
 }
 
 /** 
-* TODO: .
+* TODO: Testing
  * function:  lst_merge_sorted
  *
  * description:  assumes both list a and b are in
@@ -505,11 +506,17 @@ void lst_insert_sorted(LIST *l, ElemType x) {
  * 	the total number of elements being processed.
  */
 void lst_merge_sorted(LIST *a, LIST *b){
-
+    while(a->front->next != NULL && b->front->next != NULL){
+      if(b->front->val >= a->front->val){
+        b->front->next = a->front->next;
+        a->front->next = NULL;//Free's pointer
+        a->front->next = &b;//?Reference?
+      }
+    }
 }
 
 /**
-* TODO: .
+* TODO: Need's Testing
 * function:  lst_clone
 *
 * description:  makes a "deep copy" of the given list a
@@ -517,15 +524,22 @@ void lst_merge_sorted(LIST *a, LIST *b){
 *
 */
 LIST * lst_clone(LIST *a) {
+  NODE *clone = NULL;//!Does this need to be a NODE or LIST deep copy?
+  NODE *p = a->front;
 
-  return NULL;
-
+  while(p != NULL){//?Are all variables deep copied
+    clone = malloc(sizeof(struct NODE*));//?Correct dynamic allocation?
+    clone->val = p->val;
+    clone->next = p->next;
+    p = p->next;
+  }
+  return clone;
 }
 
 
 
 /**
-* TODO: .
+* TODO: Testing
 * function:  lst_from_array 
 *
 * description:  creates a new list populated with the
@@ -538,15 +552,30 @@ LIST * lst_clone(LIST *a) {
 *
 * runtime requirement:  THETA(n)
 */
-LIST * lst_from_array(ElemType a[], int n){
+LIST * lst_from_array(ElemType a[], int n){//!Can you return NODE types out of LIST return functions
+    NODE *p = (struct NODE*) malloc(sizeof(struct NODE*));//Linked list
+    NODE *newNode = NULL;
 
-  return NULL;
-
+    if(n < 1)
+      printf("Invalid array size\n");
+    else{
+      //Creates head nodes
+      p->val = a[0];
+      p->next = newNode;
+      for(int x = 1; x < n; x++){//?Does this need to be free'd so it can hold new variables? 
+        newNode = (struct NODE*)malloc(sizeof(struct NODE*));
+        newNode->val = a[x];
+        newNode->next = NULL;//Points to empty position
+        p->next = newNode;
+      }
+    }
+  return p;
 }
 
 
 /**
-* TODO: .
+ * ! I don't know how the return types work with ElemType is it structured correctly
+* TODO: Testing
 * function:  lst_to_array 
 *
 * description:  allocates an array of ElemType and populates
@@ -556,10 +585,20 @@ LIST * lst_from_array(ElemType a[], int n){
 *
 * runtime requirement:  THETA(n)
 *
-*/
+* ! Needs to utlize dynamic array allocation
+**/
 ElemType * lst_to_array(LIST *lst) {
+  NODE *p = lst->front;
+  int x = 0;
+  int len = lst_length(lst);//*Returns lst length
+  int **lstArray = malloc((len + 1)*sizeof(int*));//! Does this allocate full length of array
 
-  return NULL;
+  while(p != NULL && x <= len){
+    lstArray[x] = p->val;
+    x++;
+    p = p->next;
+  }
+  return lstArray;//!Is this returning a pointer or a double pointer
 }
 
 
@@ -625,7 +664,7 @@ LIST * lst_prefix(LIST *lst, unsigned int k) {
 
 
 /**
-* TODO: .
+* TODO: Needs to be finished than tested
 * function:  lst_filter_leq
 *
 * description:  removes all elements of the given list (lst) which
@@ -664,9 +703,23 @@ LIST * lst_prefix(LIST *lst, unsigned int k) {
 *			
 */
 LIST * lst_filter_leq(LIST *lst, ElemType cutoff) {
-
+  NODE *p = lst->front;
+  NODE *prev = NULL;
+  NODE *next = NULL;
+  
+  if(p == NULL)
+    printf("Invalid list length");
+  else{
+    next = p->next;//!Might cause seg fault
+    while(p != NULL){
+      if(p->val >= cutoff){//Evaluates cutoff point
+        
+      }
+      p = p->next;
+      next = p->next;//Maintanes the head
+    }
+  }
   return NULL;
-
 }
 
 /**
@@ -711,4 +764,11 @@ LIST * lst_filter_leq(LIST *lst, ElemType cutoff) {
 */
 void lst_concat(LIST *a, LIST *b) {
 
+  //Checks sanity -> concat
+  NODE *al = a->front;
+  NODE *bl = b->front;
+
+  while(al->next != NULL && bl->next != NULL){
+
+  }
 }
