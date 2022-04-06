@@ -517,7 +517,7 @@ void lst_merge_sorted(LIST *a, LIST *b){
 }
 
 /**
-* TODO: Need's Testing
+* TODO: Need's Testing, Particuallary pointer reference from head => clone list
 * function:  lst_clone
 *
 * description:  makes a "deep copy" of the given list a
@@ -526,7 +526,8 @@ void lst_merge_sorted(LIST *a, LIST *b){
 */
 LIST * lst_clone(LIST *a) {
   LIST *head = NULL;
-  NODE *clone = head->front;//*Revisions made here
+  NODE *clone = NULL;//*Revisions made here
+  head->front = clone;
   NODE *p = a->front;
   while(p != NULL){//?Are all variables deep copied
     clone = malloc(sizeof(struct NODE*));//?Correct dynamic allocation?
@@ -705,23 +706,26 @@ LIST * lst_prefix(LIST *lst, unsigned int k) {
 *			
 */
 LIST * lst_filter_leq(LIST *lst, ElemType cutoff) {
-  NODE *p = lst->front;
-  // NODE *prev = NULL;
-  // NODE *next = NULL;
+  LIST *head = NULL;
+  NODE *c = lst->front;
+  NODE *prev = NULL;
+  NODE *next = NULL;
+
   
-  if(p == NULL)
+  if(c == NULL)
     printf("Invalid list length");
   else{
-    next = p->next;
-    while(p != NULL){
-      if(p->val <= cutoff){//Evaluates cutoff point
-        
+    prev = c;
+    next = c->next;
+    while(c != NULL){
+      if(c->val <= cutoff){//Evaluates cutoff point
+        prev->next = next;
       }
-      p = p->next;
-      next = p->next;//Maintanes the head
+      c = c->next;
+      next = c->next;//Maintanes the head
     }
   }
-  return NULL;
+  return head;
 }
 
 /**
