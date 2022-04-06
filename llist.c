@@ -364,7 +364,7 @@ NODE *tmp;
 
 
 /**
-* ? TODO: Is this a function that needs to be done
+* TODO: Not Listed
 * function: lst_remove_all_slow
 * description:  removes all occurrences of x
 *   from given list (if any).
@@ -383,7 +383,7 @@ int n=0;
 }
 
 /** 
- * ? TODO: Is this a todo functionn
+ * TODO: Not Listed
  * function: lst_sra_bad_case (sra:  slow_remove_all)
  *
  * description: constructs a list of length n such that 
@@ -406,8 +406,8 @@ int k=n/2;
   return l;
 }
 
-/** \
-* TODO: .:.
+/** 
+* TODO: Not Listed
 *   function:  lst_remove_all_fast
 *   description:  same behavior/semantics as
 *      lst_remove_all_slow.  However, this function
@@ -710,9 +710,9 @@ LIST * lst_filter_leq(LIST *lst, ElemType cutoff) {
   if(p == NULL)
     printf("Invalid list length");
   else{
-    next = p->next;//!Might cause seg fault
+    next = p->next;
     while(p != NULL){
-      if(p->val >= cutoff){//Evaluates cutoff point
+      if(p->val <= cutoff){//Evaluates cutoff point
         
       }
       p = p->next;
@@ -768,7 +768,13 @@ void lst_concat(LIST *a, LIST *b) {
   NODE *al = a->front;
   NODE *bl = b->front;
 
-  while(al->next != NULL && bl->next != NULL){
-
+  while(al != NULL){
+    if(al->next == NULL && bl->next != NULL){
+      al->next = bl;//Set's null ptr to bl pos
+      al = al->next;//al walk
+      bl = bl->next;//bl walk
+      al->next = NULL;
+    }else if(bl->next == NULL)
+      printf("End of concatination\n");
   }
 }
