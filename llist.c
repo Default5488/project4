@@ -87,7 +87,8 @@ NODE *recrusiveReverseList(NODE *p)//! Do we pass NODE or LIST?
 {
   if(p==NULL) return NULL;
   if(p->next==NULL) return p;//One size node
-  NODE *tmp = recrusiveReverseList(p->next);//*Stores values in reverse ordr
+  NODE *tmp = recrusiveReverseList(p->next);//*Stores values in reverse order
+  printf("Looped\n");
   tmp->next->next = p;
   p->next = NULL;//First is now last
   return tmp;
@@ -106,7 +107,7 @@ void lst_print_rev(LIST *l) //! Probably needs filter, to verify none NULL ptr s
   NODE *p = l->front;
   // NODE *tmp = NULL;
 
-  printf("\n\n***Before revers print**\n");
+  printf("\n\n***Before reverse print**\n");
   lst_print(l);
   printf("\n***Reverse***");
   recrusiveReverseList(p);
@@ -510,7 +511,7 @@ void lst_merge_sorted(LIST *a, LIST *b){
       if(b->front->val >= a->front->val){
         b->front->next = a->front->next;
         a->front->next = NULL;//Free's pointer
-        a->front->next = &b;//?Reference?
+        a->front->next = b->front;//?Reference?
       }
     }
 }
@@ -524,16 +525,16 @@ void lst_merge_sorted(LIST *a, LIST *b){
 *
 */
 LIST * lst_clone(LIST *a) {
-  NODE *clone = NULL;//!Does this need to be a NODE or LIST deep copy?
+  LIST *head = NULL;
+  NODE *clone = head->front;//*Revisions made here
   NODE *p = a->front;
-
   while(p != NULL){//?Are all variables deep copied
     clone = malloc(sizeof(struct NODE*));//?Correct dynamic allocation?
     clone->val = p->val;
     clone->next = p->next;
     p = p->next;
   }
-  return clone;
+  return head;
 }
 
 
@@ -553,7 +554,8 @@ LIST * lst_clone(LIST *a) {
 * runtime requirement:  THETA(n)
 */
 LIST * lst_from_array(ElemType a[], int n){//!Can you return NODE types out of LIST return functions
-    NODE *p = (struct NODE*) malloc(sizeof(struct NODE*));//Linked list
+    LIST *head = NULL;//New Wrapper of size n ->k \n
+    NODE *p = malloc(n*sizeof(struct NODE*));//Linked list
     NODE *newNode = NULL;
 
     if(n < 1)
@@ -563,13 +565,13 @@ LIST * lst_from_array(ElemType a[], int n){//!Can you return NODE types out of L
       p->val = a[0];
       p->next = newNode;
       for(int x = 1; x < n; x++){//?Does this need to be free'd so it can hold new variables? 
-        newNode = (struct NODE*)malloc(sizeof(struct NODE*));
+        newNode = malloc(sizeof(struct NODE*));
         newNode->val = a[x];
         newNode->next = NULL;//Points to empty position
         p->next = newNode;
       }
     }
-  return p;
+  return head;
 }
 
 
@@ -591,14 +593,14 @@ ElemType * lst_to_array(LIST *lst) {
   NODE *p = lst->front;
   int x = 0;
   int len = lst_length(lst);//*Returns lst length
-  int **lstArray = malloc((len + 1)*sizeof(int*));//! Does this allocate full length of array
+  ElemType **lstArray = malloc((len + 1)*sizeof(ElemType*));//! Does this allocate full length of array
 
   while(p != NULL && x <= len){
-    lstArray[x] = p->val;
+    *lstArray[x] = p->val;
     x++;
     p = p->next;
   }
-  return lstArray;//!Is this returning a pointer or a double pointer
+  return *lstArray;//!Is this returning a pointer or a double pointer
 }
 
 
@@ -704,8 +706,8 @@ LIST * lst_prefix(LIST *lst, unsigned int k) {
 */
 LIST * lst_filter_leq(LIST *lst, ElemType cutoff) {
   NODE *p = lst->front;
-  NODE *prev = NULL;
-  NODE *next = NULL;
+  // NODE *prev = NULL;
+  // NODE *next = NULL;
   
   if(p == NULL)
     printf("Invalid list length");
