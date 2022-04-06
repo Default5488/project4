@@ -8,7 +8,7 @@ tests_pt1: llist.o tests_pt1.c
 	gcc -std=c99 tests_pt1.c llist.o -o tests_pt1
 
 
-llist.o: list.h llist.c
+llist.o: list.h
 	gcc -std=c99 -c llist.c
 
 clean:
