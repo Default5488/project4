@@ -38,7 +38,6 @@ NODE *pnext;
     free(p);
     p = pnext;
   }
-  // now free the LIST 
   free(l);
 }
 
@@ -80,37 +79,35 @@ int lst_are_equal(LIST *lst1, LIST *lst2)
   return 1;//All checks passed, strings are even
 }
 
-/**
- * Runs until reaching head at NULL, when null, returns backwards reversing the list
- **/
-NODE *recrusiveReverseList(NODE *p)//! Do we pass NODE or LIST?
-{
-  if(p==NULL) return NULL;
-  if(p->next==NULL) return p;//One size node
-  NODE *tmp = recrusiveReverseList(p->next);//*Stores values in reverse order
-  printf("Looped\n");
-  tmp->next->next = p;
-  p->next = NULL;//First is now last
-  return tmp;
-}
-
 
 /**
-* TODO: !Testing!
-* TODO: Logic is to start at front of list, use recursion to walk to end and print in reverse
+* TODO: Debugged functioning
 * 
 * Try to do without looking at notes!
 * Hints:  recursive helper function
 */
 void lst_print_rev(LIST *l) //! Probably needs filter, to verify none NULL ptr sending/returned
 {
-  NODE *p = l->front;
-  // NODE *tmp = NULL;
+  NODE *prev = NULL;
+  NODE *curr = l->front;
+  NODE *next = NULL;
 
-  printf("\n\n***Before reverse print**\n");
-  lst_print(l);
-  printf("\n***Reverse***");
-  recrusiveReverseList(p);
+  while(curr != NULL){
+    next = curr->next;//Stores next
+    curr->next = prev;//Reverse nodes pointer
+    prev = curr;
+    curr = next;
+  }
+  
+  printf("[");
+  while(prev != NULL){
+    if(prev->next == NULL)
+      printf("%d", prev->val);
+    else if( prev->next != NULL)
+      printf("%d, ", prev->val);
+    prev = prev->next;
+  }
+  printf("]");
 }
 
 
@@ -127,15 +124,13 @@ NODE *p = malloc(sizeof(NODE));
 
 void lst_push_back(LIST *l, ElemType val) {
 NODE *p;
-
-  if(l->back == NULL)   // list empty - same as push_front
+  if(l->back == NULL)  
 	lst_push_front(l, val);
-  else {  // at least one element before push
+  else {  
 	p = malloc(sizeof(NODE));
 	p->val = val;
 	p->next = NULL;
 	l->back->next = p;
-
 	l->back = p;  
   }
 }
@@ -159,6 +154,9 @@ int n=0;
   return n;
 }
 
+/**
+* TODO: Tested and Debugged
+*/
 int lst_is_empty(LIST *l) {
   return l->front == NULL;
 }
@@ -179,7 +177,7 @@ int lst_count(LIST *l, ElemType x)
   NODE *p;
   p = l->front;
 
-  while(p->next != NULL)//* Or while(p)
+  while(p != NULL)//* Or while(p)
   {
     if(p->val == x)
     {
@@ -284,33 +282,33 @@ NODE *p;
 
 
 /**
-*    TODO: Testing Needed
-*   !Needs testing
+*    TODO: Testing almost done, just needs NullPTR printout
 *    if list is empty, we do nothing and return arbitrary value
 *    otherwise, the last element in the list is removed and its
 *      value is returned.
 *
 */
 ElemType lst_pop_back(LIST *l) {
-  NODE* tmp = l->front;//Points to front of list
+  NODE* tmp = NULL;
   NODE* prev  = NULL;
-  // int pos;//Pos of linked list
+  int val;
+
   
-  if(tmp == NULL){
-    l->front = tmp->next;//Changes head to next position
-    free(l->front);//Frees head
+  if(l->front == NULL){
+    // printf("\n<some arbitrary number (NO SEG FAULT!)>");
+    return 0; 
+  }else{
+    tmp = l->front;
+    while(tmp != NULL){
+      prev = tmp;
+      tmp = tmp->next;
+    }
+    val = prev->val;
+    prev->next = NULL;
+    free(tmp);
   }
-
-  while(tmp->next != NULL){
-    prev = tmp;//Last point before removal
-    tmp = tmp->next;
-  }
-
-  prev->next = tmp->next;//Removes current tmp
-  free(tmp);//Frees current tmp
-  return DEFAULT;
+  return val;
 } 
-
 
 /**
 *  TODO: Testing
@@ -324,12 +322,25 @@ void lst_reverse(LIST *l) {
   NODE *curr = l->front;
   NODE *next = NULL;
 
-  while(curr != NULL){
-    next = curr->next;//Stores next value
-    curr->next = prev;
+  if(curr == NULL){
+    printf("Empty set\n");
+  }else if(curr->next == NULL){
+    printf("Single Set");
+  }else{
+    next = curr->next;
+    
+    curr->next = NULL; 
     prev = curr;
-    curr = next;
+    while(curr != NULL){
+      curr = next;
+      next = curr->next;
+      printf("Next: %d\nCurr:%d", next->val, curr->val);
+      curr->next = prev;
+      curr = next;
+      printf("curr: %d\n", prev->val);
+    }
   }
+  l->front = prev;
 }
 
 
@@ -517,7 +528,7 @@ void lst_merge_sorted(LIST *a, LIST *b){
 }
 
 /**
-* TODO: Need's Testing, Particuallary pointer reference from head => clone list
+* TODO: Tested and Debugged
 * function:  lst_clone
 *
 * description:  makes a "deep copy" of the given list a
@@ -525,15 +536,28 @@ void lst_merge_sorted(LIST *a, LIST *b){
 *
 */
 LIST * lst_clone(LIST *a) {
-  LIST *head = NULL;
-  NODE *clone = NULL;//*Revisions made here
-  head->front = clone;
+  LIST *head = lst_create();
   NODE *p = a->front;
-  while(p != NULL){//?Are all variables deep copied
-    clone = malloc(sizeof(struct NODE*));//?Correct dynamic allocation?
-    clone->val = p->val;
-    clone->next = p->next;
+  NODE *c = NULL;
+
+  if(p == NULL){
+    return head;
+  }
+  else{
+    c = malloc(sizeof(struct NODE*));
+    c->val = p->val;
+    c->next = NULL;
     p = p->next;
+    head->front = c;
+
+    while(p != NULL && c!=NULL){
+      NODE *newNode = malloc(sizeof(struct NODE*));
+      newNode->val = p->val;
+      newNode->next = NULL;
+      c->next = newNode;
+      p = p->next;
+      c = c->next;
+    }
   }
   return head;
 }
@@ -541,7 +565,7 @@ LIST * lst_clone(LIST *a) {
 
 
 /**
-* TODO: Testing
+* TODO: Needs Testing
 * function:  lst_from_array 
 *
 * description:  creates a new list populated with the
@@ -553,7 +577,7 @@ LIST * lst_clone(LIST *a) {
 *      Parameter n indicates the length of the given array.
 *
 * runtime requirement:  THETA(n)
-*/
+*/ 
 LIST * lst_from_array(ElemType a[], int n){//!Can you return NODE types out of LIST return functions
     LIST *head = NULL;//New Wrapper of size n ->k \n
     NODE *p = malloc(n*sizeof(struct NODE*));//Linked list
@@ -577,8 +601,8 @@ LIST * lst_from_array(ElemType a[], int n){//!Can you return NODE types out of L
 
 
 /**
- * ! I don't know how the return types work with ElemType is it structured correctly
-* TODO: Testing
+ * 
+* TODO: Tested and Debugged
 * function:  lst_to_array 
 *
 * description:  allocates an array of ElemType and populates
@@ -587,26 +611,28 @@ LIST * lst_from_array(ElemType a[], int n){//!Can you return NODE types out of L
 *         both data structures).
 *
 * runtime requirement:  THETA(n)
-*
-* ! Needs to utlize dynamic array allocation
 **/
 ElemType * lst_to_array(LIST *lst) {
   NODE *p = lst->front;
   int x = 0;
-  int len = lst_length(lst);//*Returns lst length
-  ElemType **lstArray = malloc((len + 1)*sizeof(ElemType*));//! Does this allocate full length of array
+  int len = lst_length(lst);
+  ElemType *lstArray = malloc((len + 1)*sizeof(ElemType*));
 
-  while(p != NULL && x <= len){
-    *lstArray[x] = p->val;
-    x++;
-    p = p->next;
+  if(p == NULL){
+    return NULL;
+  }else{  
+    while(p != NULL && x <= len){
+      lstArray[x] = p->val;
+      x++;
+      p = p->next;
+    }
   }
-  return *lstArray;//!Is this returning a pointer or a double pointer
+  return lstArray;
 }
 
 
 /**
-* TODO: .
+* TODO: Coding
 * function:  lst_prefix
 *
 * description:  removes the first k elements from the
@@ -706,27 +732,59 @@ LIST * lst_prefix(LIST *lst, unsigned int k) {
 *			
 */
 LIST * lst_filter_leq(LIST *lst, ElemType cutoff) {
-  LIST *head = NULL;
+  LIST *head = lst_create();
   NODE *c = lst->front;
   NODE *prev = NULL;
   NODE *next = NULL;
+  NODE *newLst = NULL;
 
-  
-  if(c == NULL)
-    printf("Invalid list length");
-  else{
+  if(c == NULL){
+    head->front = c;
+    return head;
+  }else{
     prev = c;
     next = c->next;
     while(c != NULL){
-      if(c->val <= cutoff){//Evaluates cutoff point
+      printf("******\n");
+      if(c->val <= cutoff){
+        printf("***\n");
         prev->next = next;
+        newLst = c;
+        c = c->next;
       }
       c = c->next;
-      next = c->next;//Maintanes the head
     }
+    head->front = newLst;
   }
   return head;
 }
+
+  //head->newLst
+
+
+
+    // prev = c;
+    // next = c->next;
+    // printf("Before While\n");
+    // while(c != NULL){
+    //   printf("\n***W***\n");
+    //   if(c->val <= cutoff){
+    //       next = c->next;
+    //       prev->next = next;
+    //       free(c);
+    //       c = next;
+    //   }
+    //   c = c->next;
+    // }
+    // printf("\n***After While***");
+  
+  // head->front = c;
+
+
+
+
+
+
 
 /**
 * TODO: .
