@@ -334,7 +334,7 @@ void lst_reverse(LIST *l) {
     while(curr != NULL && next->next != NULL){
       curr = next;
       next = curr->next;
-      printf("prev: %d\tCurr: %d\tNext: %d\n", prev->val, curr->val, next->val);
+      // printf("prev: %d\tCurr: %d\tNext: %d\n", prev->val, curr->val, next->val);
       curr->next = prev;
       prev = curr;
       curr = next;
@@ -455,11 +455,22 @@ NODE *p = l->front;
   return 1;
 }
 
+/**
+* TODO: Helper Function
+* Helper function for lst_insert_sorted
+* returns a newly created node
+*/
+NODE * nodeCreation(ElemType x){
+  NODE *newNode = malloc(sizeof(struct NODE*));
+  newNode->val = x;
+  newNode->next = NULL;
+  return newNode;
+}
 
 /** 
-* TODO: .:. Testing needed
+* TODO: .:. Tested and Debugged
 * function:  lst_insert_sorted
-*
+*sort
 * description:  assumes given list is already in sorted order
 *	   and inserts x into the appropriate position
 * 	   retaining sorted-ness.
@@ -472,24 +483,43 @@ NODE *p = l->front;
 void lst_insert_sorted(LIST *l, ElemType x) {
     NODE *curr = l->front;
     NODE *prev = NULL;
-    NODE *newNode = (NODE*)malloc(sizeof(NODE*));
+    NODE *next = NULL;
+    NODE *newNode = NULL;
+    int len = lst_length(l);
 
-    if(curr == NULL)
-      return;//! ? Return Type?
+    if(curr == NULL){
+      newNode = nodeCreation(x);
+      l->front = newNode;
+    }else if(x <= curr->val){
+      lst_push_front(l, x);
+    }
     else{
-      prev = curr;
-      while(curr != NULL){
-        if((x >= curr->val) && (x <= curr->next->val)){//Compares x value, in bounds !Needs
-          newNode->val = x;
-          newNode->next = curr->next;
-          prev->next = newNode;
-          curr = curr->next;
-        }else{
-          curr = curr->next;
+       prev = curr;
+       next = curr->next;
+       while(next != NULL){
+         if(x>curr->val && x<next->val){
+            newNode = nodeCreation(x);
+            newNode->next = next;
+            curr->next = newNode;
+            
+            prev = curr;
+            curr = curr->next;
+            next = curr->next;
+            break;
+         }else{
+            prev = curr;
+            curr = curr->next;
+            next = curr->next;
+         }
+        }if(x > curr->val){
+          newNode = nodeCreation(x);
+          curr->next = newNode;
         }
       }
-    }
-}
+} 
+
+
+
 
 /** 
 * TODO: Testing
@@ -526,13 +556,21 @@ void lst_insert_sorted(LIST *l, ElemType x) {
  * 	the total number of elements being processed.
  */
 void lst_merge_sorted(LIST *a, LIST *b){
-    while(a->front->next != NULL && b->front->next != NULL){
-      if(b->front->val >= a->front->val){
-        b->front->next = a->front->next;
-        a->front->next = NULL;//Free's pointer
-        a->front->next = b->front;//?Reference?
-      }
-    }
+  int aLen = lst_length(a);
+  int bLen = lst_length(b);
+  LIST *temp = NULL;
+  NODE *tmp = temp->front;
+  NODE *la = a->front;
+  NODE *lb = b->front;
+  
+  if(bLen == 0)
+    return;
+  else if(bLen == 1){
+    a->front = b->front;
+    b->front = NULL;
+  }
+  
+  a = temp;
 }
 
 /**
@@ -587,23 +625,25 @@ LIST * lst_clone(LIST *a) {
 * runtime requirement:  THETA(n)
 */ 
 LIST * lst_from_array(ElemType a[], int n){//!Can you return NODE types out of LIST return functions
-    LIST *head = NULL;//New Wrapper of size n ->k \n
-    NODE *p = malloc(n*sizeof(struct NODE*));//Linked list
-    NODE *newNode = NULL;
+  LIST *head = malloc(sizeof(struct LIST*));//New Wrapper of size n ->k \n
+  NODE *p = malloc(n*sizeof(struct NODE*));//Linked list
+  NODE *newNode = NULL;
 
-    if(n < 1)
-      printf("Invalid array size\n");
-    else{
-      //Creates head nodes
-      p->val = a[0];
-      p->next = newNode;
-      for(int x = 1; x < n; x++){//?Does this need to be free'd so it can hold new variables? 
-        newNode = malloc(sizeof(struct NODE*));
-        newNode->val = a[x];
-        newNode->next = NULL;//Points to empty position
-        p->next = newNode;
-      }
-    }
+  if(n == 0){
+    
+    p->next = NULL;
+    head->front = p;
+    return head;
+  }else if(n==1){
+    p->val = a[0];
+    p->next = NULL;
+    head->front = p;
+    return head;
+  }else{
+
+  }
+
+  head->front = p;
   return head;
 }
 
@@ -692,9 +732,30 @@ ElemType * lst_to_array(LIST *lst) {
 *		   list).
 */
 LIST * lst_prefix(LIST *lst, unsigned int k) {
-
-  return NULL;
-
+  LIST *newList = NULL;
+  NODE *pl = NULL;
+  NODE *curr = lst->front;
+  NODE *next = NULL;
+  int count = 0;
+  
+  if(k == 0 || curr == NULL){
+    printf("Em List\n");
+    return newList;
+  }else{
+    while(curr!=NULL && count < k){
+      pl = curr;
+      next = curr->next;
+      curr = curr->next;
+      
+      if(count == k-1){
+        curr->next = NULL;
+        lst->front = next;
+      }
+      count++;
+    }
+  }
+  newList->front = pl;
+  return newList;
 }
 
 
@@ -835,18 +896,21 @@ LIST * lst_filter_leq(LIST *lst, ElemType cutoff) {
 *	
 */
 void lst_concat(LIST *a, LIST *b) {
-
+  int aLen = lst_length(a);
+  int bLen = lst_length(b);
   //Checks sanity -> concat
   NODE *al = a->front;
   NODE *bl = b->front;
-
-  while(al != NULL){
-    if(al->next == NULL && bl->next != NULL){
-      al->next = bl;//Set's null ptr to bl pos
-      al = al->next;//al walk
-      bl = bl->next;//bl walk
-      al->next = NULL;
-    }else if(bl->next == NULL)
-      printf("End of concatination\n");
+  NODE *aBack = find_back(a);//A back
+  NODE *bBack = find_back(b);
+  if(aLen == 0){
+    a->front = b->front;
+    return;
+  }else if(bLen == 0){
+    return;
   }
+  aBack->next = bl;
+  // b->front = NULL;
+  // b->back = NULL;
+  
 }
