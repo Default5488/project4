@@ -323,22 +323,30 @@ void lst_reverse(LIST *l) {
   NODE *next = NULL;
 
   if(curr == NULL){
-    printf("Empty set\n");
+    return NULL;
   }else if(curr->next == NULL){
-    printf("Single Set");
+    return;
   }else{
     next = curr->next;
     
     curr->next = NULL; 
     prev = curr;
-    while(curr != NULL){
+    while(curr != NULL && next->next != NULL){
       curr = next;
       next = curr->next;
-      printf("Next: %d\nCurr:%d", next->val, curr->val);
+      printf("prev: %d\tCurr: %d\tNext: %d\n", prev->val, curr->val, next->val);
       curr->next = prev;
+      prev = curr;
       curr = next;
-      printf("curr: %d\n", prev->val);
     }
+    curr = next;
+    next->next = NULL;
+    curr->next = prev;
+    // prev = curr;
+    
+    
+    printf("P: %d\t C:%d", prev->val, curr->val);
+    printf("End");
   }
   l->front = prev;
 }
