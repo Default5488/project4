@@ -334,7 +334,6 @@ void lst_reverse(LIST *l) {
     while(curr != NULL && next->next != NULL){
       curr = next;
       next = curr->next;
-      // printf("prev: %d\tCurr: %d\tNext: %d\n", prev->val, curr->val, next->val);
       curr->next = prev;
       prev = curr;
       curr = next;
@@ -342,11 +341,6 @@ void lst_reverse(LIST *l) {
     curr = next;
     next->next = NULL;
     curr->next = prev;
-    // prev = curr;
-    
-    
-    printf("P: %d\t C:%d", prev->val, curr->val);
-    printf("End");
   }
   l->front = prev;
 }
@@ -628,11 +622,11 @@ LIST * lst_from_array(ElemType a[], int n){//!Can you return NODE types out of L
   LIST *head = malloc(sizeof(struct LIST*));//New Wrapper of size n ->k \n
   NODE *p = malloc(n*sizeof(struct NODE*));//Linked list
   NODE *newNode = NULL;
+  printf("Test\n");
+  head->front = p;
 
   if(n == 0){
-    
-    p->next = NULL;
-    head->front = p;
+    head->front = NULL;
     return head;
   }else if(n==1){
     p->val = a[0];
@@ -640,10 +634,16 @@ LIST * lst_from_array(ElemType a[], int n){//!Can you return NODE types out of L
     head->front = p;
     return head;
   }else{
-
+    p->val = a[0];
+    p->next = NULL;
+    for(int x = 1; x < n; x++){
+      newNode = malloc(sizeof(struct NODE*));
+      newNode->val = a[x];
+      newNode->next = NULL;
+      p->next = newNode;
+      p = p->next;
+    }
   }
-
-  head->front = p;
   return head;
 }
 
@@ -743,18 +743,26 @@ LIST * lst_prefix(LIST *lst, unsigned int k) {
     return newList;
   }else{
     while(curr!=NULL && count < k){
-      pl = curr;
-      next = curr->next;
-      curr = curr->next;
-      
-      if(count == k-1){
+      if(count != k-1){
+        pl = curr;
+        pl = pl->next;
+        next = curr->next;
+        curr = curr->next;
+        printf("Loop:%d\n", curr->val);
+      }else{
+        printf("\nReLink, C:%d, V:%d\n", curr->val, next->val);
         curr->next = NULL;
-        lst->front = next;
+        printf("Break\n");
+        lst->front->next = next;
+        printf("break\n");
+        break;
       }
       count++;
     }
   }
   newList->front = pl;
+  printf("Printed lIST\n");
+  lst_print(newList);
   return newList;
 }
 
