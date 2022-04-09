@@ -664,17 +664,17 @@ ElemType * lst_to_array(LIST *lst) {
   NODE *p = lst->front;
   int x = 0;
   int len = lst_length(lst);
-  ElemType *lstArray = malloc((len + 1)*sizeof(ElemType*));
+  ElemType *lstArray = malloc(len*sizeof(ElemType*));
 
   if(p == NULL){
     return NULL;
   }else{  
-    while(p != NULL && x <= len){
-      lstArray[x] = p->val;
-      x++;
+    for(int i = 0; i < len; i++){
+      lstArray[i] = p->val;
       p = p->next;
     }
   }
+  
   return lstArray;
 }
 
@@ -732,10 +732,10 @@ ElemType * lst_to_array(LIST *lst) {
 *		   list).
 */
 LIST * lst_prefix(LIST *lst, unsigned int k) {
-  LIST *newList = malloc(sizeof(struct LIST*));
-  NODE *pl = NULL;
+  LIST *newList = lst_create();
+  NODE *pl = lst->front;
   NODE *curr = lst->front;
-  NODE *next = NULL;
+
   int lstSize = lst_length(lst);
   int count = 0;
   
@@ -745,7 +745,7 @@ LIST * lst_prefix(LIST *lst, unsigned int k) {
     return newList;
   }else if(k >= lstSize){
     newList->front = pl;
-    for(int i = 0; i < lstSize; i++){
+    while(curr!=NULL){
       pl = curr;
       pl = pl->next;
       curr = curr->next;
@@ -754,25 +754,15 @@ LIST * lst_prefix(LIST *lst, unsigned int k) {
   }else{
     newList->front = pl;
     while(curr!=NULL && count < k){
-      if(count != k-1){
+      if(count < k){
         pl = curr;
-        pl = pl->next;
-        next = curr->next;
         curr = curr->next;
-        printf("Loop:%d\n", curr->val);
-      }else{
-        printf("\nReLink, C:%d, V:%d\n", curr->val, next->val);
-        curr->next = NULL;
-        printf("Break\n");
-        lst->front->next = next;
-        printf("break\n");
-        break;
+        count++;
       }
-      count++;
     }
+    pl->next = NULL;
+    lst->front = curr;
   }
-  printf("Printed lIST\n");
-  lst_print(newList);
   return newList;
 }
 
@@ -928,7 +918,7 @@ void lst_concat(LIST *a, LIST *b) {
     return;
   }
   aBack->next = bl;
-  // b->front = NULL;
-  // b->back = NULL;
+  // bl = NULL;
+  // aBack->next = NULL;
   
 }
