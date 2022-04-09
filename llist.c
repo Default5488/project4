@@ -809,56 +809,74 @@ LIST * lst_prefix(LIST *lst, unsigned int k) {
 *			
 */
 LIST * lst_filter_leq(LIST *lst, ElemType cutoff) {
-  LIST *head = lst_create();
-  NODE *c = lst->front;
-  NODE *prev = NULL;
+  LIST *newList = lst_create();
+  NODE *curr = lst->front;
+  NODE *head = lst->front;
+  NODE *lstFront = NULL;
+  NODE *tail = NULL;
   NODE *next = NULL;
-  NODE *newLst = NULL;
-
-  if(c == NULL){
-    head->front = c;
-    return head;
+  NODE *prev = NULL;
+  int len = 2;
+ 
+ printf("k");
+  if(curr == NULL || len == 0){
+    newList->front = curr;
+    lst->front = NULL;
+    return newList;
+  }else if(len == 1){
+    newList->front = curr;
+    lst->front = NULL;
+    return newList;
   }else{
-    prev = c;
-    next = c->next;
-    while(c != NULL){
-      printf("******\n");
-      if(c->val <= cutoff){
-        printf("***\n");
-        prev->next = next;
-        newLst = c;
-        c = c->next;
+    newList->front = head;
+    while(curr != NULL){
+
+      next = curr->next;
+      if(curr->val <= cutoff){
+        curr->next = NULL;
+        head->next = curr;
+        printf("head:%d, \n", head->val);
+        if(prev->val <= curr->val)
+        {
+          printf("Sep: %d\n", prev->val);
+          prev->next = next;
+        }
+
+        head = curr;
+        head->next = NULL; 
+        curr = next;
+      }else{
+        prev = curr;
+        curr = next;
       }
-      c = c->next;
     }
-    head->front = newLst;
   }
-  return head;
+  printf("List Printouts\nlst: ");
+  lst_print(lst);
+  printf("\nnewList: ");
+  lst_print(newList);
+  printf("\n");
+  lst_pop_front(newList);
+  return newList;
 }
 
-  //head->newLst
+ 
 
-
-
-    // prev = c;
-    // next = c->next;
-    // printf("Before While\n");
-    // while(c != NULL){
-    //   printf("\n***W***\n");
-    //   if(c->val <= cutoff){
-    //       next = c->next;
-    //       prev->next = next;
-    //       free(c);
-    //       c = next;
-    //   }
-    //   c = c->next;
-    // }
-    // printf("\n***After While***");
-  
-  // head->front = c;
-
-
-
+// newList->front = head;
+//     while(curr != NULL ){
+//       next = curr->next;
+//       if(curr->val <= cutoff){
+//         printf("***Check\n");
+//         curr->next = NULL;
+//         head->next = curr;
+//         head = curr;
+//         head->next = NULL;
+//         curr = next;
+//       }else{
+//         curr= curr->next;
+//         // lst->front = curr;
+//       }
+//     }
 
 
 
