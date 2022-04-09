@@ -732,16 +732,27 @@ ElemType * lst_to_array(LIST *lst) {
 *		   list).
 */
 LIST * lst_prefix(LIST *lst, unsigned int k) {
-  LIST *newList = NULL;
+  LIST *newList = malloc(sizeof(struct LIST*));
   NODE *pl = NULL;
   NODE *curr = lst->front;
   NODE *next = NULL;
+  int lstSize = lst_length(lst);
   int count = 0;
   
   if(k == 0 || curr == NULL){
-    printf("Em List\n");
+    newList->front = curr;
+    lst->front = NULL;
+    return newList;
+  }else if(k >= lstSize){
+    newList->front = pl;
+    for(int i = 0; i < lstSize; i++){
+      pl = curr;
+      pl = pl->next;
+      curr = curr->next;
+    }
     return newList;
   }else{
+    newList->front = pl;
     while(curr!=NULL && count < k){
       if(count != k-1){
         pl = curr;
@@ -760,7 +771,6 @@ LIST * lst_prefix(LIST *lst, unsigned int k) {
       count++;
     }
   }
-  newList->front = pl;
   printf("Printed lIST\n");
   lst_print(newList);
   return newList;
